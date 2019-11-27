@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+
 import androidx.annotation.NonNull;
+
 import android.util.Log;
 import android.view.View;
 
@@ -43,7 +45,6 @@ import androidx.annotation.Nullable;
 
 public class UIManagerModuleWrapper implements
     ActivityProvider,
-    ImageLoader,
     InternalModule,
     JavaScriptContextProvider,
     UIManager {
@@ -63,7 +64,6 @@ public class UIManagerModuleWrapper implements
   public List<Class> getExportedInterfaces() {
     return Arrays.<Class>asList(
         ActivityProvider.class,
-        ImageLoader.class,
         JavaScriptContextProvider.class,
         UIManager.class
     );
@@ -206,53 +206,6 @@ public class UIManagerModuleWrapper implements
 
   public long getJavaScriptContextRef() {
     return mReactContext.getJavaScriptContextHolder().get();
-  }
-
-  @Override
-  public void loadImageForDisplayFromURL(@NonNull String url, final ResultListener resultListener) {
-    ImageRequest imageRequest = ImageRequest.fromUri(url);
-
-    ImagePipeline imagePipeline = Fresco.getImagePipeline();
-    DataSource<CloseableReference<CloseableImage>> dataSource =
-        imagePipeline.fetchDecodedImage(imageRequest, mReactContext);
-
-    dataSource.subscribe(
-        new BaseBitmapDataSubscriber() {
-          @Override
-          public void onNewResultImpl(@Nullable Bitmap bitmap) {
-            if (bitmap == null) {
-              resultListener.onFailure(new Exception("Loaded bitmap is null"));
-              return;
-            }
-            resultListener.onSuccess(bitmap);
-          }
-
-          @Override
-          public void onFailureImpl(DataSource dataSource) {
-            resultListener.onFailure(dataSource.getFailureCause());
-          }
-        },
-        AsyncTask.THREAD_POOL_EXECUTOR);
-  }
-
-  @Override
-  public void loadImageForManipulationFromURL(@NonNull String url, final ResultListener resultListener) {
-    Glide.with(getContext())
-        .asBitmap()
-        .diskCacheStrategy(DiskCacheStrategy.NONE)
-        .skipMemoryCache(true)
-        .load(url)
-        .into(new SimpleTarget<Bitmap>() {
-          @Override
-          public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-            resultListener.onSuccess(resource);
-          }
-
-          @Override
-          public void onLoadFailed(@Nullable Drawable errorDrawable) {
-            resultListener.onFailure(new Exception("Loading bitmap failed"));
-          }
-        });
   }
 
   @Override
