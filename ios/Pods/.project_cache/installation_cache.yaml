@@ -6578,6 +6578,16 @@ CACHE_KEYS:
     PROJECT_NAME: EXHaptics
     SPECS:
       - EXHaptics (8.0.0-rc.0)
+  EXImageLoader:
+    BUILD_SETTINGS_CHECKSUM:
+      EXImageLoader: ff130239ac953a821bd3d528b6f13828
+    CHECKSUM: edbf02910aec4b87dfd637de27181e442468401e
+    FILES:
+      - "../../packages/expo-image-loader/ios/EXImageLoader/EXImageLoader.h"
+      - "../../packages/expo-image-loader/ios/EXImageLoader/EXImageLoader.m"
+    PROJECT_NAME: EXImageLoader
+    SPECS:
+      - EXImageLoader (1.0.0)
   EXImageManipulator:
     BUILD_SETTINGS_CHECKSUM:
       EXImageManipulator: 5d68aa0d6f2a7fdd838a8783136b6a40
@@ -7141,16 +7151,16 @@ CACHE_KEYS:
       - nanopb/encode (0.3.901)
   Pods-Exponent:
     BUILD_SETTINGS_CHECKSUM:
-      Debug: f1d931dbfce19c0a049cc9c50342119b
-      Release: f1d931dbfce19c0a049cc9c50342119b
+      Debug: 305c9310a75313cfa14c0039fe129169
+      Release: 305c9310a75313cfa14c0039fe129169
   Pods-ExponentIntegrationTests:
     BUILD_SETTINGS_CHECKSUM:
-      Debug: 6f968735eb5f2e008fa585a70dff74c1
-      Release: 6f968735eb5f2e008fa585a70dff74c1
+      Debug: 581b86419bc6648fd39c43d68035a3c6
+      Release: 581b86419bc6648fd39c43d68035a3c6
   Pods-Tests:
     BUILD_SETTINGS_CHECKSUM:
-      Debug: 6f968735eb5f2e008fa585a70dff74c1
-      Release: 6f968735eb5f2e008fa585a70dff74c1
+      Debug: 581b86419bc6648fd39c43d68035a3c6
+      Release: 581b86419bc6648fd39c43d68035a3c6
   Protobuf:
     BUILD_SETTINGS_CHECKSUM:
       Protobuf: e9ec876cfd5ece357978b5d515d5282c
