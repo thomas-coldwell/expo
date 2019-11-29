@@ -2,9 +2,9 @@
 
 #import <UMCore/UMInternalModule.h>
 #import <UMImageLoaderInterface/UMImageLoaderInterface.h>
-#import <UMReactNativeAdapter/UMBridgeModule.h>
+#import <React/RCTBridgeModule.h>
 #import <UIKit/UIKit.h>
 
-@interface EXImageLoader : NSObject <UMBridgeModule, UMInternalModule, UMImageLoaderInterface>
+@interface EXImageLoader : NSObject <RCTBridgeModule, UMInternalModule, UMImageLoaderInterface>
 
 @end
