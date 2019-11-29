@@ -1,3 +1,5 @@
+// Copyright 2019-present 650 Industries. All rights reserved.
+
 #import <EXImageLoader/EXImageLoader.h>
 #import <React/RCTImageLoader.h>
 
@@ -29,10 +31,10 @@ UM_REGISTER_MODULE();
 - (void)loadImageForURL:(NSURL *)imageURL
       completionHandler:(UMImageLoaderCompletionBlock)completionHandler
 {
-   [_bridge.imageLoader loadImageWithURLRequest:[NSURLRequest requestWithURL:imageURL]
-                                       callback:^(NSError *error, UIImage *loadedImage) {
-                                         completionHandler(error, loadedImage);
-                                       }];
+  [[_bridge moduleForClass:[RCTImageLoader class]] loadImageWithURLRequest:[NSURLRequest requestWithURL:imageURL]
+                                                                  callback:^(NSError *error, UIImage *loadedImage) {
+                                                                    completionHandler(error, loadedImage);
+                                                                  }];
 }
 
 @end
