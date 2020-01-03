@@ -8,19 +8,19 @@ type Props = {
 export default class AppLoading extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
-    SplashScreen.preventAutoHide();
+    // SplashScreen.preventAutoHide();
   }
 
   componentWillUnmount() {
     if (this.props.autoHideSplash === undefined || this.props.autoHideSplash) {
       // Hide immediately in E2E tests
-      if (global.__E2E__) {
-        SplashScreen.hide();
-      } else {
-        setTimeout(() => {
-          SplashScreen.hide();
-        }, 200);
-      }
+      // if (global.__E2E__) {
+      //   // SplashScreen.hide();
+      // } else {
+      //   setTimeout(() => {
+      //     // SplashScreen.hide();
+      //   }, 200);
+      // }
     }
   }
 

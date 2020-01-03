@@ -3,7 +3,6 @@ import * as AR from './AR';
 import * as Logs from './logs/Logs';
 import * as ScreenOrientation from './ScreenOrientation/ScreenOrientation';
 import * as Updates from './Updates/Updates';
-import * as SplashScreen from './launch/SplashScreen';
 export { Logs };
 export { default as apisAreAvailable } from './apisAreAvailable';
 export { default as registerRootComponent } from './launch/registerRootComponent';
@@ -12,9 +11,7 @@ export { default as Notifications } from './Notifications/Notifications';
 // The following should all be extracted from this package
 export { AR };
 export { ScreenOrientation };
-export { SplashScreen };
 export { Updates };
-export { default as AppLoading } from './launch/AppLoading';
 export { default as AuthSession } from './AuthSession';
 export { default as DangerZone } from './DangerZone';
 // @ts-ignore
@@ -33,6 +30,8 @@ Animated,
 Amplitude, 
 // @ts-ignore
 AppAuth, 
+// @ts-ignore
+AppLoading, 
 // @ts-ignore
 Asset, 
 // @ts-ignore
@@ -139,6 +138,8 @@ Sharing,
 SMS, 
 // @ts-ignore
 Speech, 
+// @ts-ignore
+SplashScreen, 
 // @ts-ignore
 SQLite, 
 // @ts-ignore

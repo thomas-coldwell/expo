@@ -27,12 +27,6 @@ Object.defineProperty(exports, "Notifications", {
     return _Notifications.default;
   }
 });
-Object.defineProperty(exports, "AppLoading", {
-  enumerable: true,
-  get: function () {
-    return _AppLoading.default;
-  }
-});
 Object.defineProperty(exports, "AuthSession", {
   enumerable: true,
   get: function () {
@@ -85,6 +79,12 @@ Object.defineProperty(exports, "AppAuth", {
   enumerable: true,
   get: function () {
     return _removed.AppAuth;
+  }
+});
+Object.defineProperty(exports, "AppLoading", {
+  enumerable: true,
+  get: function () {
+    return _removed.AppLoading;
   }
 });
 Object.defineProperty(exports, "Asset", {
@@ -405,6 +405,12 @@ Object.defineProperty(exports, "Speech", {
     return _removed.Speech;
   }
 });
+Object.defineProperty(exports, "SplashScreen", {
+  enumerable: true,
+  get: function () {
+    return _removed.SplashScreen;
+  }
+});
 Object.defineProperty(exports, "SQLite", {
   enumerable: true,
   get: function () {
@@ -459,7 +465,7 @@ Object.defineProperty(exports, "WebView", {
     return _removed.WebView;
   }
 });
-exports.SplashScreen = exports.Updates = exports.ScreenOrientation = exports.Logs = exports.AR = void 0;
+exports.Updates = exports.ScreenOrientation = exports.Logs = exports.AR = void 0;
 
 require("./Expo.fx");
 
@@ -479,10 +485,6 @@ var Updates = _interopRequireWildcard(require("./Updates/Updates"));
 
 exports.Updates = Updates;
 
-var SplashScreen = _interopRequireWildcard(require("./launch/SplashScreen"));
-
-exports.SplashScreen = SplashScreen;
-
 var _apisAreAvailable = _interopRequireDefault(require("./apisAreAvailable"));
 
 var _registerRootComponent = _interopRequireDefault(require("./launch/registerRootComponent"));
@@ -490,8 +492,6 @@ var _registerRootComponent = _interopRequireDefault(require("./launch/registerRo
 var _Linking = _interopRequireDefault(require("./Linking/Linking"));
 
 var _Notifications = _interopRequireDefault(require("./Notifications/Notifications"));
-
-var _AppLoading = _interopRequireDefault(require("./launch/AppLoading"));
 
 var _AuthSession = _interopRequireDefault(require("./AuthSession"));
 

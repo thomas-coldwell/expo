@@ -1362,6 +1362,9 @@ PODS:
     - UMPermissionsInterface
   - EXSpeech (8.0.0):
     - UMCore
+  - EXSplashScreen (1.0.0):
+    - React-Core
+    - UMCore
   - EXSQLite (8.0.0):
     - UMCore
     - UMFileSystemInterface
@@ -2277,6 +2280,7 @@ DEPENDENCIES:
   - EXSharing (from `../packages/expo-sharing/ios`)
   - EXSMS (from `../packages/expo-sms/ios`)
   - EXSpeech (from `../packages/expo-speech/ios`)
+  - EXSplashScreen (from `../packages/expo-splash-screen/ios`)
   - EXSQLite (from `../packages/expo-sqlite/ios`)
   - EXStoreReview (from `../packages/expo-store-review/ios`)
   - EXTaskManager (from `../packages/expo-task-manager/ios`)
@@ -3108,6 +3112,9 @@ EXTERNAL SOURCES:
   EXSpeech:
     :path: !ruby/object:Pathname
     path: "../packages/expo-speech/ios"
+  EXSplashScreen:
+    :path: !ruby/object:Pathname
+    path: "../packages/expo-splash-screen/ios"
   EXSQLite:
     :path: !ruby/object:Pathname
     path: "../packages/expo-sqlite/ios"
@@ -3552,6 +3559,7 @@ SPEC CHECKSUMS:
   EXSharing: 5c9aa8f3cc1c117de74e50ccef862c52f57af2d7
   EXSMS: 6b67daeb76b759934f4fae68437a0132570ddb5c
   EXSpeech: 3f7d29b3da9283637176f0fd8dbb1e9da59b2741
+  EXSplashScreen: 8261a8f3b8b92547d62a8cf7897680a4b8f98b69
   EXSQLite: 220226a354912b100dfe913f5fe6f31762c8927e
   EXStoreReview: 6fc278b9e50805ce3f7a2b9f15b5f0addaa21b90
   EXTaskManager: 6294f9e3f9d4a431655557f759ffebc53e1f9d0d
