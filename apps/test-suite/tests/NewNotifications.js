@@ -1,6 +1,7 @@
 'use strict';
 
 import { Platform } from '@unimodules/core';
+import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 
 import * as TestUtils from '../TestUtils';
@@ -52,6 +53,23 @@ export async function test(t) {
         // but `t.pending()` still doesn't work.
         await waitFor(500);
         t.expect(tokenFromEvent).toEqual(tokenFromMethodCall);
+      });
+
+      // Not running this test on web since Expo push notification doesn't yet support web.
+      const itWithExpoPushToken = ['ios', 'android'].includes(Platform.OS) ? t.it : t.xit;
+      itWithExpoPushToken('fetches Expo push token', async () => {
+        let experienceId = undefined;
+        if (!Constants.manifest) {
+          // Absence of manifest means we're running out of managed workflow
+          // in bare-expo. @exponent/bare-expo "experience" has been configured
+          // to use Apple Push Notification key that will work in bare-expo.
+          experienceId = '@exponent/bare-expo';
+        }
+        const devicePushToken = await Notifications.getExpoPushTokenAsync({
+          experienceId,
+        });
+        t.expect(devicePushToken.type).toBe('expo');
+        t.expect(typeof devicePushToken.data).toBe('string');
       });
     });
   });
