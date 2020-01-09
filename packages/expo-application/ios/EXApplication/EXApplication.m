@@ -2,6 +2,7 @@
 #import <UMCore/UMUtilities.h>
 #import <EXApplication/EXApplication.h>
 #import <UIKit/UIKit.h>
+#import <EXApplication/EXProvisioningProfile.h>
 
 NSString * const kEXApplicationInstallationIdKey = @"kEXApplicationInstallationIdKey";
 
@@ -47,6 +48,18 @@ UM_EXPORT_METHOD_AS(getInstallationIdAsync, getInstallationIdAsyncWithResolver:(
     [[NSUserDefaults standardUserDefaults] synchronize];
   }
   return uuid;
+}
+
+UM_EXPORT_METHOD_AS(getAppReleaseTypeAsync, getAppReleaseTypeAsyncWithResolver:(UMPromiseResolveBlock)resolve rejecter:(UMPromiseRejectBlock)reject)
+{
+  EXProvisioningProfile *mainProvisioningProfile = [EXProvisioningProfile mainProvisioningProfile];
+  resolve(@([mainProvisioningProfile appReleaseType]));
+}
+
+UM_EXPORT_METHOD_AS(getPushNotificationServiceEnvironmentAsync, getPushNotificationServiceEnvironmentAsyncWithResolver:(UMPromiseResolveBlock)resolve rejecter:(UMPromiseRejectBlock)reject)
+{
+  EXProvisioningProfile *mainProvisioningProfile = [EXProvisioningProfile mainProvisioningProfile];
+  resolve([mainProvisioningProfile notificationServiceEnvironment]);
 }
 
 - (NSDictionary *)constantsToExport
