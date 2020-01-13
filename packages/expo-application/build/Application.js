@@ -25,6 +25,12 @@ export async function getIosIdForVendorAsync() {
     }
     return await ExpoApplication.getIosIdForVendorAsync();
 }
+export async function getInstallationIdAsync() {
+    if (!ExpoApplication.getInstallationIdAsync) {
+        throw new UnavailabilityError('expo-application', 'getInstallationIdAsync');
+    }
+    return await ExpoApplication.getInstallationIdAsync();
+}
 export async function getInstallationTimeAsync() {
     if (!ExpoApplication.getInstallationTimeAsync) {
         throw new UnavailabilityError('expo-application', 'getInstallationTimeAsync');

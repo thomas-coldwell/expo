@@ -31,10 +31,12 @@ public class ApplicationModule extends ExportedModule implements RegistryLifecyc
   private Context mContext;
   private ActivityProvider mActivityProvider;
   private Activity mActivity;
+  private InstallationId mInstallationId;
 
   public ApplicationModule(Context context) {
     super(context);
     mContext = context;
+    mInstallationId = new InstallationId(mContext);
   }
 
   @Override
@@ -73,7 +75,13 @@ public class ApplicationModule extends ExportedModule implements RegistryLifecyc
 
     constants.put("androidId", Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID));
 
+
     return constants;
+  }
+
+  @ExpoMethod
+  public void getInstallationIdAsync(Promise promise) {
+    promise.resolve(mInstallationId.getId());
   }
 
   @ExpoMethod

@@ -30,6 +30,13 @@ export async function getIosIdForVendorAsync(): Promise<string> {
   return await ExpoApplication.getIosIdForVendorAsync();
 }
 
+export async function getInstallationIdAsync(): Promise<string> {
+  if (!ExpoApplication.getInstallationIdAsync) {
+    throw new UnavailabilityError('expo-application', 'getInstallationIdAsync');
+  }
+  return await ExpoApplication.getInstallationIdAsync();
+}
+
 export async function getInstallationTimeAsync(): Promise<Date> {
   if (!ExpoApplication.getInstallationTimeAsync) {
     throw new UnavailabilityError('expo-application', 'getInstallationTimeAsync');

@@ -89,6 +89,21 @@ await Application.getIosIdForVendorAsync();
 // "68753A44-4D6F-1226-9C60-0050E4C00067"
 ```
 
+### `Application.getInstallationIdAsync()`
+
+Resolves with a UUID uniquely identifying an app's installation.
+
+#### Returns
+
+A `Promise` that resolves to a `string` specifying the installation ID.
+
+**Examples**
+
+```js
+await Application.getInstallationIdAsync();
+// "1160b5c8-93b8-4878-95f3-dd67a3ac79e3"
+```
+
 ### `Application.getInstallReferrerAsync()`
 
 **Android only.** Gets the referrer URL of the installed app with the [`Install Referrer API`](https://developer.android.com/google/play/installreferrer) from the Google Play Store. In practice, the referrer URL may not be a complete, absolute URL.

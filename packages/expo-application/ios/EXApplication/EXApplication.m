@@ -3,6 +3,8 @@
 #import <EXApplication/EXApplication.h>
 #import <UIKit/UIKit.h>
 
+NSString * const kEXApplicationInstallationIdKey = @"kEXApplicationInstallationIdKey";
+
 @implementation EXApplication
 
 UM_EXPORT_MODULE(ExpoApplication);
@@ -29,6 +31,17 @@ UM_EXPORT_METHOD_AS(getInstallationTimeAsync, getInstallationTimeAsyncWithResolv
     NSNumber *timeNumber = @(timeInMilliseconds);
     resolve(timeNumber);
   }
+}
+
+UM_EXPORT_METHOD_AS(getInstallationIdAsync, getInstallationIdAsyncWithResolver:(UMPromiseResolveBlock)resolve rejecter:(UMPromiseRejectBlock)reject)
+{
+  NSString *uuid = [[NSUserDefaults standardUserDefaults] stringForKey:kEXApplicationInstallationIdKey];
+  if (!uuid) {
+    uuid = [[NSUUID UUID] UUIDString];
+    [[NSUserDefaults standardUserDefaults] setObject:uuid forKey:kEXApplicationInstallationIdKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+  }
+  resolve(uuid);
 }
 
 - (NSDictionary *)constantsToExport
