@@ -1,4 +1,5 @@
 import * as Application from 'expo-application';
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import ExponentTest from '../ExponentTest';
 
@@ -41,6 +42,14 @@ export async function test({ describe, it, expect, jasmine }) {
         expect(installationId).toBeDefined();
         expect(installationId).toEqual(jasmine.any(String));
       });
+
+      if (['expo', 'standalone'].includes(Constants.appOwnership)) {
+        it('in managed workflow returns Constants.installationId', async () => {
+          let installationId = await Application.getInstallationIdAsync();
+          expect(installationId).toBeDefined();
+          expect(installationId).toBe(Constants.installationId);
+        });
+      }
     });
   });
 
