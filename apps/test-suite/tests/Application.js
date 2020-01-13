@@ -35,6 +35,13 @@ export async function test({ describe, it, expect, jasmine }) {
         expect(installationTime).toEqual(jasmine.any(Date));
       });
     });
+    describe(`Application.getInstallationIdAsync()`, () => {
+      it(`returns a string`, async () => {
+        let installationId = await Application.getInstallationIdAsync();
+        expect(installationId).toBeDefined();
+        expect(installationId).toEqual(jasmine.any(String));
+      });
+    });
   });
 
   if (Platform.OS === 'ios') {
