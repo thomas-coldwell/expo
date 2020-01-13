@@ -17,6 +17,7 @@
 #import "EXScopedBranch.h"
 #import "EXScopedErrorRecoveryModule.h"
 #import "EXScopedFacebook.h"
+#import "EXScopedApplication.h"
 
 #import "EXScopedReactNativeAdapter.h"
 #import "EXModuleRegistryBinding.h"
@@ -35,6 +36,11 @@
 #if __has_include(<EXConstants/EXConstantsService.h>)
   EXConstantsBinding *constantsBinding = [[EXConstantsBinding alloc] initWithExperienceId:experienceId andParams:params];
   [moduleRegistry registerInternalModule:constantsBinding];
+#endif
+
+#if __has_include(<EXApplication/EXApplication.h>)
+  EXScopedApplication *scopedApplication = [[EXScopedApplication alloc] initWithParams:params];
+  [moduleRegistry registerExportedModule:scopedApplication];
 #endif
 
 #if __has_include(<EXFacebook/EXFacebook.h>)
