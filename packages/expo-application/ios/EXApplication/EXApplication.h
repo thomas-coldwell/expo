@@ -5,4 +5,6 @@
 
 @interface EXApplication : UMExportedModule
 
+- (NSString *)getInstallationId;
+
 @end

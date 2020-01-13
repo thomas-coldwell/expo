@@ -35,13 +35,18 @@ UM_EXPORT_METHOD_AS(getInstallationTimeAsync, getInstallationTimeAsyncWithResolv
 
 UM_EXPORT_METHOD_AS(getInstallationIdAsync, getInstallationIdAsyncWithResolver:(UMPromiseResolveBlock)resolve rejecter:(UMPromiseRejectBlock)reject)
 {
+  resolve([self getInstallationId]);
+}
+
+- (NSString *)getInstallationId
+{
   NSString *uuid = [[NSUserDefaults standardUserDefaults] stringForKey:kEXApplicationInstallationIdKey];
   if (!uuid) {
     uuid = [[NSUUID UUID] UUIDString];
     [[NSUserDefaults standardUserDefaults] setObject:uuid forKey:kEXApplicationInstallationIdKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
   }
-  resolve(uuid);
+  return uuid;
 }
 
 - (NSDictionary *)constantsToExport
