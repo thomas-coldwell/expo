@@ -57,6 +57,10 @@ export function getTestModules() {
     modules.push(require('./tests/JSC'));
   }
 
+  //if (Platform.OS === 'ios') {
+  modules.push(require('./tests/FirebaseApp'));
+  //}
+
   if (global.DETOX) {
     modules.push(
       require('./tests/Contacts'),
