@@ -5,10 +5,12 @@
 #import <EXGoogleSignIn/EXGoogleSignIn+Serialization.h>
 #import <UMCore/UMUtilitiesInterface.h>
 #import <UMCore/UMUtilities.h>
+#import <UMConstantsInterface/UMConstantsInterface.h>
 
 @interface EXGoogleSignIn ()
 
 @property (nonatomic, weak) id<UMUtilitiesInterface> utilities;
+@property (nonatomic, weak) id<UMConstantsInterface> constants;
 @property (nonatomic, weak) UMModuleRegistry *moduleRegistry;
 @property (nonatomic, strong) EXAuthTask *authTask;
 
@@ -37,6 +39,7 @@ UM_EXPORT_MODULE(ExpoGoogleSignIn);
 {
   _moduleRegistry = moduleRegistry;
   _utilities = [moduleRegistry getModuleImplementingProtocol:@protocol(UMUtilitiesInterface)];
+  _constants = [moduleRegistry getModuleImplementingProtocol:@protocol(UMConstantsInterface)];
 }
 
 - (NSDictionary *)constantsToExport
@@ -88,14 +91,12 @@ UM_EXPORT_MODULE(ExpoGoogleSignIn);
 
 - (NSString *)_getNativeClientIdOrReject:(UMPromiseRejectBlock)reject
 {
-  NSString *path = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
-  
-  if (!path) {
+  NSDictionary* googleServicesFile = _constants.constants[@"googleServicesFile"];
+  if (!googleServicesFile) {
     reject(EX_E_EXCEPTION, @"Missing GoogleService-Info.plist", nil);
     return nil;
   }
-  NSDictionary *plist = [[NSDictionary alloc] initWithContentsOfFile:path];
-  NSString *clientId = plist[@"CLIENT_ID"];
+  NSString *clientId = googleServicesFile[@"CLIENT_ID"];
   if (clientId != nil && ![clientId isEqualToString:@""]) return clientId;
   reject(EX_E_EXCEPTION, @"GoogleService-Info.plist `CLIENT_ID` is invalid", nil);
   return nil;
