@@ -1,18 +1,22 @@
+import { Platform } from 'react-native';
 import * as FirebaseApp from 'expo-firebase-app';
 
 export const name = 'FirebaseApp';
 
-const DEFAULT_APP_NAME = '__FIRAPP_DEFAULT';
+const DEFAULT_APP_NAME = Platform.select({
+  ios: '__FIRAPP_DEFAULT',
+  android: '[DEFAULT]',
+});
 
-export async function test({ describe, beforeAll, afterAll, it, expect }) {
+export async function test({ describe, beforeEach, beforeAll, afterAll, it, expect }) {
   describe(name, () => {
     beforeAll(async () => {
       await FirebaseApp.initializeAppAsync();
     });
 
-    afterAll(async () => {
+    /*afterAll(async () => {
       await FirebaseApp.initializeAppAsync();
-    });
+    });*/
 
     describe('getAppAsync()', async () => {
       it(`returns default Firebase app`, async () => {
@@ -41,8 +45,26 @@ export async function test({ describe, beforeAll, afterAll, it, expect }) {
       });
     });
 
+    describe('getAppOptions()', async () => {
+      it(`returns the firebase options`, async () => {
+        let error = null;
+        try {
+          const app = await FirebaseApp.getAppAsync();
+          const options = await app.getOptionsAsync();
+          expect(options.appId).not.toBeNull();
+          expect(options.messagingSenderId).not.toBeNull();
+          expect(options.apiKey).not.toBeNull();
+          expect(options.projectId).not.toBeNull();
+          expect(options.clientId).not.toBeNull();
+        } catch (e) {
+          error = e;
+        }
+        expect(error).toBeNull();
+      });
+    });
+
     describe('deleteAsync()', async () => {
-      it(`deleteAsync should succeed`, async () => {
+      it(`succeeds when app exists`, async () => {
         let error = null;
         try {
           const app = await FirebaseApp.getAppAsync();
@@ -52,7 +74,7 @@ export async function test({ describe, beforeAll, afterAll, it, expect }) {
         }
         expect(error).toBeNull();
       });
-      it(`default app should be gone`, async () => {
+      it(`is not returned by getAppAsync`, async () => {
         let error = null;
         try {
           const app = await FirebaseApp.getAppAsync();
@@ -62,11 +84,22 @@ export async function test({ describe, beforeAll, afterAll, it, expect }) {
         }
         expect(error).not.toBeNull();
       });
-      it(`getAppsAsync should no longer return the app`, async () => {
+      it(`is not returned by getAppsAsync`, async () => {
         let error = null;
         try {
           const apps = await FirebaseApp.getAppsAsync();
           expect(apps.length).toBe(0);
+        } catch (e) {
+          error = e;
+        }
+        expect(error).toBeNull();
+      });
+      it(`fails when app has been deleted`, async () => {
+        let error = null;
+        await FirebaseApp.initializeAppAsync();
+        const app = await FirebaseApp.getAppAsync();
+        try {
+          await app.deleteAsync();
         } catch (e) {
           error = e;
         }
