@@ -11,6 +11,8 @@ import android.util.Log;
 
 import com.facebook.device.yearclass.YearClass;
 
+import com.google.android.gms.common.internal.StringResourceValueReader;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +29,7 @@ public class ConstantsService implements InternalModule, ConstantsInterface {
   protected Context mContext;
   protected int mStatusBarHeight = 0;
   private String mSessionId = UUID.randomUUID().toString();
+  private Map<String, String> mGoogleServicesFile;
 
   private static int convertPixelsToDp(float px, Context context) {
     Resources resources = context.getResources();
@@ -46,6 +49,8 @@ public class ConstantsService implements InternalModule, ConstantsInterface {
       // Convert from pixels to dip
       mStatusBarHeight = convertPixelsToDp(statusBarHeightPixels, context);
     }
+
+    mGoogleServicesFile = getGoogleServicesFile(context);
   }
 
   @Override
@@ -70,7 +75,7 @@ public class ConstantsService implements InternalModule, ConstantsInterface {
       PackageInfo pInfo = packageManager.getPackageInfo(mContext.getPackageName(), 0);
       constants.put("nativeAppVersion", pInfo.versionName);
 
-      int versionCode = (int)getLongVersionCode(pInfo);
+      int versionCode = (int) getLongVersionCode(pInfo);
       constants.put("nativeBuildVersion", Integer.toString(versionCode));
     } catch (PackageManager.NameNotFoundException e) {
       Log.e(TAG, "Exception: ", e);
@@ -81,6 +86,11 @@ public class ConstantsService implements InternalModule, ConstantsInterface {
 
     platform.put("android", androidPlatform);
     constants.put("platform", platform);
+
+    if (mGoogleServicesFile != null) {
+      constants.put("googleServicesFile", mGoogleServicesFile);
+    }
+
     return constants;
   }
 
@@ -142,5 +152,34 @@ public class ConstantsService implements InternalModule, ConstantsInterface {
       return info.getLongVersionCode();
     }
     return info.versionCode;
+  }
+
+  private static Map<String, String> getGoogleServicesFile(Context context) {
+    StringResourceValueReader reader = new StringResourceValueReader(context);
+    String appId = reader.getString("google_app_id");
+    if (TextUtils.isEmpty(appId))
+      return null;
+    String apiKey = reader.getString("google_api_key");
+    String databaseURL = reader.getString("firebase_database_url");
+    String trackingId = reader.getString("ga_trackingId");
+    String messagingSenderId = reader.getString("gcm_defaultSenderId");
+    String storageBucket = reader.getString("google_storage_bucket");
+    String projectId = reader.getString("project_id");
+
+    Map<String, String> result = new HashMap<>();
+    result.put("appId", appId);
+    if (apiKey != null)
+      result.put("apiKey", apiKey);
+    if (databaseURL != null)
+      result.put("databaseURL", databaseURL);
+    if (trackingId != null)
+      result.put("trackingId", trackingId);
+    if (messagingSenderId != null)
+      result.put("messagingSenderId", messagingSenderId);
+    if (storageBucket != null)
+      result.put("storageBucket", storageBucket);
+    if (projectId != null)
+      result.put("projectId", projectId);
+    return result;
   }
 }
