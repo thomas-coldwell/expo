@@ -2,6 +2,8 @@ package expo.modules.firebase.app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.TextUtils;
+import android.os.Bundle;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -9,13 +11,14 @@ import com.google.firebase.FirebaseOptions;
 import org.unimodules.core.ExportedModule;
 import org.unimodules.core.ModuleRegistry;
 import org.unimodules.core.Promise;
-import org.unimodules.core.arguments.MapArguments;
 import org.unimodules.core.interfaces.ActivityProvider;
 import org.unimodules.core.interfaces.ExpoMethod;
 import org.unimodules.core.interfaces.RegistryLifecycleListener;
 
-import java.util.HashMap;
+import com.google.android.gms.common.internal.StringResourceValueReader;
+
 import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -25,9 +28,12 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
   private static final String NAME = "ExpoFirebaseApp";
 
   private Activity mActivity;
+  private Context mContext;
+  private Map<String, String> mDefaultOptions;
 
   public FirebaseAppModule(Context context) {
     super(context);
+    mContext = context;
   }
 
   @Override
@@ -45,28 +51,49 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
   public Map<String, Object> getConstants() {
     final Map<String, Object> constants = new HashMap<>();
 
-    /*FirebaseApp firebaseApp = getDefaultApp();
-    if (firebaseApp != null) {
-      FirebaseOptions appOptions = firebaseApp.getOptions();
-      Map<String, Object> options = new HashMap<>();
+    if (mDefaultOptions == null) {
+      mDefaultOptions = getFirebaseOptionsJSONFromResources();
+    }
 
-      options.put("apiKey", appOptions.getApiKey());
-      options.put("appId", appOptions.getApplicationId());
-      options.put("databaseURL", appOptions.getDatabaseUrl());
-      options.put("messagingSenderId", appOptions.getGcmSenderId());
-      options.put("name", firebaseApp.getName());
-      options.put("projectId", appOptions.getProjectId());
-      options.put("storageBucket", appOptions.getStorageBucket());
-
-      constants.put("app", options);
-    }*/
+    if (mDefaultOptions != null) {
+      constants.put("DEFAULT_OPTIONS", mDefaultOptions);
+    }
 
     return constants;
   }
 
-  private FirebaseOptions getFirebaseOptionsFromGoogleServicesFile() {
-    // TODO
-    return null;
+  private Map<String, String> getFirebaseOptionsJSONFromResources() {
+    StringResourceValueReader reader = new StringResourceValueReader(mContext);
+    String appId = reader.getString("google_app_id");
+    if (TextUtils.isEmpty(appId)) return null;
+    String apiKey = reader.getString("google_api_key");
+    String databaseURL = reader.getString("firebase_database_url");
+    String trackingId = reader.getString("ga_trackingId");
+    String messagingSenderId = reader.getString("gcm_defaultSenderId");
+    String storageBucket = reader.getString("google_storage_bucket");
+    String projectId = reader.getString("project_id");
+
+    Map<String, String> result = new HashMap<>();
+    result.put("appId", appId);
+    if (apiKey != null)
+      result.put("apiKey", apiKey);
+    if (databaseURL != null)
+      result.put("databaseURL", databaseURL);
+    if (trackingId != null)
+      result.put("trackingId", trackingId);
+    if (messagingSenderId != null)
+      result.put("messagingSenderId", messagingSenderId);
+    if (storageBucket != null)
+      result.put("storageBucket", storageBucket);
+    if (projectId != null)
+      result.put("projectId", projectId);
+    return result;
+  }
+
+  private FirebaseOptions getFirebaseOptionsFromResources() {
+    Map<String, String> json = getFirebaseOptionsJSONFromResources();
+    if (json == null) return null;
+    return getFirebaseOptionsFromJSON(json);
   }
 
   private static FirebaseOptions getFirebaseOptionsFromJSON(final Map<String, String> json) {
@@ -83,28 +110,64 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
     return builder.build();
   }
 
+  private static Map<String, String> getFirebaseOptionsJSON(final FirebaseOptions options) {
+    final Map<String, String> result = new HashMap<>();
+    result.put("apiKey", options.getApiKey());
+    result.put("appId", options.getApplicationId());
+    result.put("databaseURL", options.getDatabaseUrl());
+    result.put("messagingSenderId", options.getGcmSenderId());
+    result.put("projectId", options.getProjectId());
+    result.put("storageBucket", options.getStorageBucket());
+    return result;
+  }
+
+  private static boolean isFirebaseOptionsEqual(final FirebaseOptions opts1, final FirebaseOptions opts2) {
+    if (opts1 == opts2) return true;
+    if ((opts1 == null) || (opts2 == null)) return false;
+    return opts1.equals(opts2);
+  }
+
+  private final FirebaseApp getFirebaseApp(final String name) {
+    return (name == null) ? FirebaseApp.getInstance() : FirebaseApp.getInstance(name);
+  }
+
   private void updateFirebaseApp(final FirebaseOptions options, final String name) {
-    // TODO
-    /*FirebaseApp firebaseApp = getDefaultApp();
-    if (firebaseApp != null) {
-      FirebaseOptions currentOptions = firebaseApp.getOptions();
-      if (!currentOptions.getApiKey().equals(options.get("apiKey")) ||
-              !currentOptions.getApplicationId().equals(options.get("appId"))) {
-        firebaseApp.delete();
+    FirebaseApp app;
+    try {
+      app = getFirebaseApp(name);
+    } catch (Exception e) {
+      app = null;
+    }
+
+    if (app != null) {
+      if (options == null) {
+        app.delete();
       } else {
-        promise.resolve(null);
-        return;
+        if (!isFirebaseOptionsEqual(options, app.getOptions())) {
+          app.delete();
+          if (name == null) {
+            FirebaseApp.initializeApp(mActivity.getApplicationContext(), options);
+          } else {
+            FirebaseApp.initializeApp(mActivity.getApplicationContext(), options, name);
+          }
+        }
+      }
+    } else {
+      if (options != null) {
+        if (name == null) {
+          FirebaseApp.initializeApp(mActivity.getApplicationContext(), options);
+        } else {
+          FirebaseApp.initializeApp(mActivity.getApplicationContext(), options, name);
+        }
       }
     }
-    FirebaseApp.initializeApp(mActivity.getApplicationContext(), builder.build());*/
   }
 
   @ExpoMethod
   public void initializeAppAsync(final Map<String, String> options, final String name, Promise promise) {
     try {
-      final FirebaseOptions firebaseOptions = (options != null)
-        ? getFirebaseOptionsFromJSON(options)
-        : getFirebaseOptionsFromGoogleServicesFile();
+      final FirebaseOptions firebaseOptions = (options != null) ? getFirebaseOptionsFromJSON(options)
+          : getFirebaseOptionsFromResources();
       this.updateFirebaseApp(firebaseOptions, name);
       promise.resolve(null);
     } catch (Exception e) {
@@ -115,9 +178,7 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
   @ExpoMethod
   public void deleteAppAsync(final String name, Promise promise) {
     try {
-      final FirebaseApp app = (name == null)
-        ? FirebaseApp.getInstance()
-        : FirebaseApp.getInstance(name);
+      final FirebaseApp app = getFirebaseApp(name);
       app.delete();
       promise.resolve(null);
     } catch (Exception e) {
@@ -128,12 +189,7 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
   @ExpoMethod
   public void getAppAsync(final String name, Promise promise) {
     try {
-      FirebaseApp app;
-      if (name == null) {
-        app = FirebaseApp.getInstance();
-      } else {
-        app = FirebaseApp.getInstance(name);
-      }
+      final FirebaseApp app = getFirebaseApp(name);
       promise.resolve(app.getName());
     } catch (Exception e) {
       promise.reject(e);
@@ -157,23 +213,13 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
   @ExpoMethod
   public void getAppOptionsAsync(final String name, Promise promise) {
     try {
-      FirebaseApp app;
-      if (name == null) {
-        app = FirebaseApp.getInstance();
-      } else {
-        app = FirebaseApp.getInstance(name);
+      final FirebaseApp app = getFirebaseApp(name);
+      Map<String, String> json = getFirebaseOptionsJSON(app.getOptions());
+      Bundle response = new Bundle();
+      for (Map.Entry<String, String> entry : json.entrySet()) {
+        response.putString(entry.getKey(), entry.getValue());
       }
-      FirebaseOptions options = app.getOptions();
-
-      final Map<String, String> result = new HashMap<>();
-      result.put("apiKey", options.getApiKey());
-      result.put("appId", options.getApplicationId());
-      result.put("databaseURL", options.getDatabaseUrl());
-      result.put("messagingSenderId", options.getGcmSenderId());
-      result.put("projectId", options.getProjectId());
-      result.put("storageBucket", options.getStorageBucket());
-
-      promise.resolve(result);
+      promise.resolve(response);
     } catch (Exception e) {
       promise.reject(e);
     }

@@ -1,1 +1,1 @@
-{"version":3,"file":"FirebaseApp.types.js","sourceRoot":"","sources":["../src/FirebaseApp.types.ts"],"names":[],"mappings":"AAAA,OAAO","sourcesContent":["// TODO\n"]}
+{"version":3,"file":"FirebaseApp.types.js","sourceRoot":"","sources":["../src/FirebaseApp.types.ts"],"names":[],"mappings":"","sourcesContent":["export interface FirebaseOptions {\n  appId: string;\n  apiKey: string;\n  databaseURL: string;\n  trackingId: string;\n  messagingSenderId: string;\n  storageBucket: string;\n  projectId: string;\n}\n"]}

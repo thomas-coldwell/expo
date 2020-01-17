@@ -1,22 +1,43 @@
+import { FirebaseOptions } from './FirebaseApp.types';
+export declare const DEFAULT_OPTIONS: any;
 declare class FirebaseApp {
+    /**
+     * The (read-only) name for this app.
+     */
     readonly name: string;
     constructor(name: string);
+    /**
+     * Delete the Firebase app instance.
+     */
     deleteAsync(): Promise<void>;
-    getOptionsAsync(): Promise<any>;
+    /**
+     * Returns the (read-only) configuration options for this app. These are the original parameters
+     * the app was initialized with.
+     */
+    getOptionsAsync(): Promise<FirebaseOptions>;
 }
 /**
- * Similar to `firebase.initializeApp()` on web but works to start a native Firebase app while the app is running.
- * This can be used to test the native iOS Firebase app in the Expo client.
- * This method should not be used in production, instead the app should be bundled with the native Google Services files via the `app.json`.
+ * Initializes a Firebase app.
  *
- * @param googleServices Platform specific Google Services file for starting a Firebase app during runtime
+ * On iOS and Android this method is optional, as the default Firebase app instance
+ * is automatically initialized when the `GoogleService-Info.plist` or `google-services.json`
+ * file is configured.
+ *
+ * You can use this method to initialize additional Firebase app instances. You should typically not
+ * initialize the default Firebase with custom options, as the default app is tightly coupled
+ * with the google-services config that is shipped with the app.
  */
-export declare function initializeAppAsync(options?: any, name?: string): Promise<FirebaseApp>;
+export declare function initializeAppAsync(options?: FirebaseOptions, name?: string): Promise<FirebaseApp>;
+/**
+ * Retrieves a Firebase app instance.
+ * When called with no arguments, the default app is returned. When an app name is provided, the app corresponding to that name is returned.
+ * An exception is thrown if the app being retrieved has not yet been initialized.
+ *
+ * @param name Optional name of the app to return
+ */
 export declare function getAppAsync(name?: string): Promise<FirebaseApp>;
+/**
+ * Retrieves all initialized Firebase app instances.
+ */
 export declare function getAppsAsync(): Promise<FirebaseApp[]>;
 export {};
-/**
- * Delete a running Firebase app instance. Only works for the default app. If no default app is running then nothing happens.
- *
- * @param googleServices Platform specific Google Services file.
- */

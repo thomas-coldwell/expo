@@ -1,13 +1,22 @@
 import { UnavailabilityError } from '@unimodules/core';
 import ExpoFirebaseApp from './ExpoFirebaseApp';
+import { FirebaseOptions } from './FirebaseApp.types';
+
+export const { DEFAULT_OPTIONS } = ExpoFirebaseApp;
 
 class FirebaseApp {
+  /**
+   * The (read-only) name for this app.
+   */
   public readonly name: string;
 
   constructor(name: string) {
     this.name = name;
   }
 
+  /**
+   * Delete the Firebase app instance.
+   */
   deleteAsync(): Promise<void> {
     // @ts-ignore
     if (!ExpoFirebaseApp.deleteAppAsync) {
@@ -17,7 +26,11 @@ class FirebaseApp {
     return ExpoFirebaseApp.deleteAppAsync(this.name);
   }
 
-  getOptionsAsync(): Promise<any> {
+  /**
+   * Returns the (read-only) configuration options for this app. These are the original parameters
+   * the app was initialized with.
+   */
+  getOptionsAsync(): Promise<FirebaseOptions> {
     // @ts-ignore
     if (!ExpoFirebaseApp.getAppOptionsAsync) {
       throw new UnavailabilityError('expo-firebase-app', 'getAppOptionsAsync');
@@ -28,13 +41,20 @@ class FirebaseApp {
 }
 
 /**
- * Similar to `firebase.initializeApp()` on web but works to start a native Firebase app while the app is running.
- * This can be used to test the native iOS Firebase app in the Expo client.
- * This method should not be used in production, instead the app should be bundled with the native Google Services files via the `app.json`.
+ * Initializes a Firebase app.
  *
- * @param googleServices Platform specific Google Services file for starting a Firebase app during runtime
+ * On iOS and Android this method is optional, as the default Firebase app instance
+ * is automatically initialized when the `GoogleService-Info.plist` or `google-services.json`
+ * file is configured.
+ *
+ * You can use this method to initialize additional Firebase app instances. You should typically not
+ * initialize the default Firebase with custom options, as the default app is tightly coupled
+ * with the google-services config that is shipped with the app.
  */
-export async function initializeAppAsync(options?: any, name?: string): Promise<FirebaseApp> {
+export async function initializeAppAsync(
+  options?: FirebaseOptions,
+  name?: string
+): Promise<FirebaseApp> {
   // @ts-ignore
   if (!ExpoFirebaseApp.initializeAppAsync) {
     throw new UnavailabilityError('expo-firebase-app', 'initializeAppAsync');
@@ -44,6 +64,13 @@ export async function initializeAppAsync(options?: any, name?: string): Promise<
   return new FirebaseApp(appName);
 }
 
+/**
+ * Retrieves a Firebase app instance.
+ * When called with no arguments, the default app is returned. When an app name is provided, the app corresponding to that name is returned.
+ * An exception is thrown if the app being retrieved has not yet been initialized.
+ *
+ * @param name Optional name of the app to return
+ */
 export async function getAppAsync(name?: string): Promise<FirebaseApp> {
   // @ts-ignore
   if (!ExpoFirebaseApp.getAppAsync) {
@@ -54,6 +81,9 @@ export async function getAppAsync(name?: string): Promise<FirebaseApp> {
   return new FirebaseApp(appName);
 }
 
+/**
+ * Retrieves all initialized Firebase app instances.
+ */
 export async function getAppsAsync(): Promise<FirebaseApp[]> {
   // @ts-ignore
   if (!ExpoFirebaseApp.getAppsAsync) {
@@ -63,9 +93,3 @@ export async function getAppsAsync(): Promise<FirebaseApp[]> {
   const appNames = await ExpoFirebaseApp.getAppsAsync();
   return appNames.map(appName => new FirebaseApp(appName));
 }
-
-/**
- * Delete a running Firebase app instance. Only works for the default app. If no default app is running then nothing happens.
- *
- * @param googleServices Platform specific Google Services file.
- */
