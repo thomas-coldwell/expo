@@ -63,6 +63,23 @@ export async function test({ describe, beforeEach, beforeAll, afterAll, it, expe
       });
     });
 
+    describe('DEFAULT_OPTIONS', async () => {
+      it(`returns the default firebase options`, async () => {
+        let error = null;
+        try {
+          const { DEFAULT_OPTIONS } = await FirebaseApp;
+          expect(DEFAULT_OPTIONS.appId).not.toBeNull();
+          expect(DEFAULT_OPTIONS.messagingSenderId).not.toBeNull();
+          expect(DEFAULT_OPTIONS.apiKey).not.toBeNull();
+          expect(DEFAULT_OPTIONS.projectId).not.toBeNull();
+          expect(DEFAULT_OPTIONS.clientId).not.toBeNull();
+        } catch (e) {
+          error = e;
+        }
+        expect(error).toBeNull();
+      });
+    });
+
     describe('deleteAsync()', async () => {
       it(`succeeds when app exists`, async () => {
         let error = null;
