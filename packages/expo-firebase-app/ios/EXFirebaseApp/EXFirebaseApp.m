@@ -29,6 +29,18 @@ UM_EXPORT_MODULE(ExpoFirebaseApp);
   }];
 }
 
+- (NSDictionary *)constantsToExport
+{
+  FIROptions* firOptions = [self.class firOptionsWithGoogleServicesFile:self->_constants.constants[@"googleServicesFile"]];
+  if (firOptions) {
+    return @{
+      @"DEFAULT_OPTIONS": [self.class firOptionsToJSON:firOptions]
+    };
+  } else {
+    return @{};
+  }
+}
+
 - (void)reject:(UMPromiseRejectBlock)reject withException:(NSException *)exception {
   NSError *error = [NSError errorWithDomain:@"ERR_FIREBASE_APP" code:4815162342 userInfo:@{
         @"message": exception.reason,
