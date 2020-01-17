@@ -92,7 +92,8 @@ UM_EXPORT_METHOD_AS(getAppsAsync,
                     reject:(UMPromiseRejectBlock)reject)
 {
   @try {
-    resolve([[FIRApp allApps]allKeys]);
+    NSArray<NSString*>* names = [[FIRApp allApps]allKeys];
+    resolve(names ? names : @[]);
   } @catch (NSException *exception) {
     [self reject:reject withException:exception];
   }
