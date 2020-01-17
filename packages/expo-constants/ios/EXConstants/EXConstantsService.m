@@ -130,12 +130,10 @@ UM_REGISTER_MODULE();
 
 - (nullable NSDictionary*)googleServicesFile
 {
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
-    if (!path) {
-        return @{};
-    }
-    NSDictionary *plist = [[NSDictionary alloc] initWithContentsOfFile:path];
-    return plist;
+  NSString *path = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
+  if (!path) return nil;
+  NSDictionary *plist = [[NSDictionary alloc] initWithContentsOfFile:path];
+  return plist;
 }
 
 # pragma mark - device info
