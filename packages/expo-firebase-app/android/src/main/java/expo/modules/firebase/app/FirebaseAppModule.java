@@ -5,6 +5,8 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.os.Bundle;
 
+import org.json.JSONObject;
+
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
@@ -14,6 +16,7 @@ import org.unimodules.core.Promise;
 import org.unimodules.core.interfaces.ActivityProvider;
 import org.unimodules.core.interfaces.ExpoMethod;
 import org.unimodules.core.interfaces.RegistryLifecycleListener;
+import org.unimodules.interfaces.constants.ConstantsInterface;
 
 import com.google.android.gms.common.internal.StringResourceValueReader;
 
@@ -29,6 +32,7 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
 
   private Activity mActivity;
   private Context mContext;
+  private ModuleRegistry mModuleRegistry;
   private Map<String, String> mDefaultOptions;
 
   public FirebaseAppModule(Context context) {
@@ -43,8 +47,10 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
 
   @Override
   public void onCreate(ModuleRegistry moduleRegistry) {
+    mModuleRegistry = moduleRegistry;
     ActivityProvider mActivityProvider = moduleRegistry.getModule(ActivityProvider.class);
     mActivity = mActivityProvider.getCurrentActivity();
+    updateFirebaseApp(getFirebaseOptionsFromJSON(getDefaultFirebaseOptionsJSON()), null);
   }
 
   @Override
@@ -52,7 +58,7 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
     final Map<String, Object> constants = new HashMap<>();
 
     if (mDefaultOptions == null) {
-      mDefaultOptions = getFirebaseOptionsJSONFromResources();
+      mDefaultOptions = getDefaultFirebaseOptionsJSON();
     }
 
     if (mDefaultOptions != null) {
@@ -60,6 +66,14 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
     }
 
     return constants;
+  }
+
+  private Map<String, String> getDefaultFirebaseOptionsJSON() {
+    Map<String, String> json = getFirebaseOptionsJSONFromManifest();
+    if (json == null) {
+      json = getFirebaseOptionsJSONFromResources();
+    }
+    return json;
   }
 
   private Map<String, String> getFirebaseOptionsJSONFromResources() {
@@ -90,13 +104,57 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
     return result;
   }
 
-  private FirebaseOptions getFirebaseOptionsFromResources() {
-    Map<String, String> json = getFirebaseOptionsJSONFromResources();
+  private static String getJSONStringByPath(JSONObject json, String path) {
     if (json == null) return null;
-    return getFirebaseOptionsFromJSON(json);
+    try {
+      String[] paths = path.split("\\.");
+      for (int i = 0; i < paths.length; i++) {
+        String name = paths[i];
+        if (!json.has(name)) return null;
+        if (i == paths.length - 1) {
+          return json.getString(name);
+        } else {
+          json = json.getJSONObject(name);
+        }
+      }
+      return null;
+    } catch (Exception err){
+      return null;
+    }
+  }
+
+  private static void addJSONStringToMap(JSONObject json, Map<String, String> map, String path, String name) {
+    String value = getJSONStringByPath(json, path);
+    if (value != null) map.put(name, value);
+  }
+
+  private Map<String, String> getFirebaseOptionsJSONFromManifest() {
+    ConstantsInterface constantsService = mModuleRegistry.getModule(ConstantsInterface.class);
+    Map<String, Object> constants = constantsService.getConstants();
+    String manifestString = (String) constants.get("manifest");
+    if (manifestString == null) return null;
+    try {
+      JSONObject manifest = new JSONObject(manifestString);
+      JSONObject android = manifest.has("android") ? manifest.getJSONObject("android") : null;
+      String googleServicesFileString = ((android != null) && android.has("googleServicesFile")) ? android.getString("googleServicesFile") : null;
+      JSONObject googleServicesFile = (googleServicesFileString != null) ? new JSONObject(googleServicesFileString) : null;
+      // https://developers.google.com/android/guides/google-services-plugin
+      Map<String, String> result = new HashMap<>();
+      addJSONStringToMap(googleServicesFile, result, "project_info.project_id", "projectId");
+      addJSONStringToMap(googleServicesFile, result, "project_info.project_number", "messagingSenderId");
+      addJSONStringToMap(googleServicesFile, result, "project_info.firebase_url", "databaseURL");
+      addJSONStringToMap(googleServicesFile, result, "project_info.storage_bucket", "storageBucket");
+      addJSONStringToMap(googleServicesFile, result, "client_info.<TODO>.mobilesdk_app_id", "appId");
+      addJSONStringToMap(googleServicesFile, result, "client_info.<TODO>.services.analytics-service.analytics_property.tracking_id", "trackingId");
+      addJSONStringToMap(googleServicesFile, result, "client_info.<TODO>.api_key.current_key", "apiKey");
+      return result.containsKey("appId") ? result : null;
+    }catch (Exception err){
+      return null;
+    }
   }
 
   private static FirebaseOptions getFirebaseOptionsFromJSON(final Map<String, String> json) {
+    if (json == null) return null;
     FirebaseOptions.Builder builder = new FirebaseOptions.Builder();
 
     builder.setApiKey(json.get("apiKey"));
@@ -167,7 +225,7 @@ public class FirebaseAppModule extends ExportedModule implements RegistryLifecyc
   public void initializeAppAsync(final Map<String, String> options, final String name, Promise promise) {
     try {
       final FirebaseOptions firebaseOptions = (options != null) ? getFirebaseOptionsFromJSON(options)
-          : getFirebaseOptionsFromResources();
+          : getFirebaseOptionsFromJSON(this.getDefaultFirebaseOptionsJSON());
       this.updateFirebaseApp(firebaseOptions, name);
       promise.resolve(null);
     } catch (Exception e) {
