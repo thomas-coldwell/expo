@@ -175,7 +175,7 @@ export default class GLHeadlessRenderingScreen extends React.PureComponent<{}, S
     this.setState({ contrast }, () => {
       this.draw();
     });
-  }
+  };
 
   render() {
     const { contrast, snapshot } = this.state;
@@ -197,7 +197,10 @@ export default class GLHeadlessRenderingScreen extends React.PureComponent<{}, S
             />
           )}
         </View>
-        <Text style={styles.sliderHeader}>{`Contrast: ${parseInt(String(contrast * 100), 10)}%`}</Text>
+        <Text style={styles.sliderHeader}>{`Contrast: ${parseInt(
+          String(contrast * 100),
+          10
+        )}%`}</Text>
         <Slider
           value={contrast}
           step={0.01}
