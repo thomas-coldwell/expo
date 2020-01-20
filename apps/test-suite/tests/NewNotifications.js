@@ -54,5 +54,32 @@ export async function test(t) {
         t.expect(tokenFromEvent).toEqual(tokenFromMethodCall);
       });
     });
+
+    t.describe('getPermissionsAsync', () => {
+      t.it('resolves with an object', async () => {
+        const permissions = await Notifications.getPermissionsAsync();
+        t.expect(permissions).toBeDefined();
+        t.expect(typeof permissions).toBe('object');
+      });
+    });
+
+    t.describe('requestPermissionsAsync', () => {
+      t.it('resolves without any arguments', async () => {
+        const permissions = await Notifications.requestPermissionsAsync();
+        t.expect(permissions).toBeDefined();
+        t.expect(typeof permissions).toBe('object');
+      });
+
+      t.it('resolves with specific permissions requested', async () => {
+        const permissions = await Notifications.requestPermissionsAsync({
+          providesAppNotificationSettings: true,
+          allowsAlert: true,
+          allowsBadge: true,
+          allowsSound: true,
+        });
+        t.expect(permissions).toBeDefined();
+        t.expect(typeof permissions).toBe('object');
+      });
+    });
   });
 }
