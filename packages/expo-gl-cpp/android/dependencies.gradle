@@ -105,21 +105,13 @@ task prepareFolly(dependsOn: dependenciesPath ? [] : [downloadFolly], type: Copy
 }
 
 task prepareHermes() {
-  def hermesPackagePath = findNodeModulePath(projectDir, "hermes-engine")
+  def hermesPackagePath = findNodeModulePath(projectDir, "@expo/hermes-dev")
   if (!hermesPackagePath) {
     throw new GradleScriptException("Could not find the hermes-engine npm package")
   }
 
-  def hermesAAR = file("$hermesPackagePath/android/hermes-debug.aar")
-  if (!hermesAAR.exists()) {
-    throw new GradleScriptException("The hermes-engine npm package is missing \"android/hermes-debug.aar\"")
-  }
-
-  def soFiles = zipTree(hermesAAR).matching({ it.include "**/*.so" })
-
   copy {
-    from soFiles
-    from "src/main/jni/first-party/hermes/Android.mk"
+    from "$hermesPackagePath/dist"
     into "$thirdPartyNdkDir/hermes"
   }
 }
@@ -316,6 +308,7 @@ task buildNdkLib(dependsOn: [prepareJSC, prepareJSI, prepareHermes, prepareBoost
     "NDK_OUT=" + temporaryDir,
     "NDK_LIBS_OUT=$buildDir/expo-gl-ndk/all",
     "THIRD_PARTY_NDK_DIR=$buildDir/third-party-ndk",
+    "VM=HERMES",
     "-C", file("src/main/jni").absolutePath,
     "--jobs", project.findProperty("jobs") ?: Runtime.runtime.availableProcessors()
   )
